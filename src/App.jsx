@@ -14,7 +14,7 @@ const App = () => {
   };
 
   const getPrompt = (name, lang) => {
-    const base = `Tell me a simple, fun story about the name "${name}". What does it mean? Where did it come from? Make it short and sweet, like you're telling it to a friend. Keep it easy to understand and make the name sound cool and special.`;
+    const base = `Tell me a simple, fun story about the name "${name}". What does it mean? Where did it come from? Make it short and sweet, like you're telling it to a friend. Keep it easy short and easy to understand and make the name sound cool and special.`;
 
     const langNote = {
       english: "",
@@ -29,32 +29,11 @@ const App = () => {
     const traits = [
       "Guardian of lost tv remotes",
       "Master of midnight snack raids",
-      "Collector of random song lyrics",
-      "Wizard of finding parking spots",
-      "Keeper of forgotten passwords",
-      "Champion of cozy blanket forts",
-      "Sorceress of perfect selfie timing",
-      "Defender of the last french fry",
-      "Architect of weekend plans",
-      "Professional cloud watcher",
-      "Curator of playlist moods",
-      "Master of indoor plant whispering",
-      "Guardian of group chat peace",
-      "Keeper of spontaneous road trips",
-      "Champion of 3am philosophical thoughts",
     ];
 
     const powers = [
       "blessed with the ability to find anything in a messy room",
       "gifted with eternal optimism and great taste in memes",
-      "cursed with always being right about the weather",
-      "enchanted with the power to make anyone laugh",
-      "destined to always have the perfect comeback (5 minutes too late)",
-      "blessed with supernatural luck in finding good parking",
-      "gifted with the ability to remember everyone's coffee order",
-      "cursed with knowing all the lyrics to 90s songs",
-      "enchanted with the power to find the comfiest spot anywhere",
-      "destined to be the friend everyone calls for advice",
     ];
 
     const trait = traits[Math.floor(Math.random() * traits.length)];
@@ -77,8 +56,8 @@ const App = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
-            "HTTP-Referer": window.location.origin, // Your site URL
-            "X-Title": "Name Magic Generator", // Your site title
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "Name Magic Generator",
           },
           body: JSON.stringify({
             model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
@@ -154,7 +133,7 @@ const App = () => {
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 transform transition-all duration-300 hover:scale-105 ">
+          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 transform transition-all duration-300 hover:scale-[103%] ">
             {!showResult ? (
               <div className="space-y-6">
                 <div className="relative">
@@ -252,21 +231,6 @@ const App = () => {
               </div>
             )}
           </div>
-
-          {/* Footer */}
-          {/* <div className="text-center text-gray-500 text-sm absolute bottom-4 left-0 right-0">
-            <p>
-              ✨ Made with love and a sprinkle of randomness by{" "}
-              <a
-                href="https://maheshhattimare.vercel.app/"
-                target="_blank"
-                className="text-blue-400 hover:underline"
-              >
-                Mahesh
-              </a>{" "}
-              ✨
-            </p>
-          </div> */}
         </div>
 
         <style>{`
