@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Sparkles, Heart, Star, Zap, Crown, Smile } from "lucide-react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Footer from "./components/Footer";
 
 const App = () => {
-  const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-
   const [name, setName] = useState("");
   const [meaning, setMeaning] = useState("");
   const [language, setLanguage] = useState("english");
@@ -16,7 +14,7 @@ const App = () => {
   };
 
   const getPrompt = (name, lang) => {
-    const base = `Imagine you're a creative and witty storyteller. Explain the meaning of the name "${name}" in a short, fun, and meaningful way — like a magical tale or a charming legend. Make it feel special, playful, and unforgettable, as if the name itself has a secret story.`;
+    const base = `Tell me a simple, fun story about the name "${name}". What does it mean? Where did it come from? Make it short and sweet, like you're telling it to a friend. Keep it easy to understand and make the name sound cool and special.`;
 
     const langNote = {
       english: "",
@@ -27,24 +25,98 @@ const App = () => {
     return `${base} ${langNote[lang]}`;
   };
 
+  const generateFallbackMeaning = (inputName) => {
+    const traits = [
+      "Guardian of lost tv remotes",
+      "Master of midnight snack raids",
+      "Collector of random song lyrics",
+      "Wizard of finding parking spots",
+      "Keeper of forgotten passwords",
+      "Champion of cozy blanket forts",
+      "Sorceress of perfect selfie timing",
+      "Defender of the last french fry",
+      "Architect of weekend plans",
+      "Professional cloud watcher",
+      "Curator of playlist moods",
+      "Master of indoor plant whispering",
+      "Guardian of group chat peace",
+      "Keeper of spontaneous road trips",
+      "Champion of 3am philosophical thoughts",
+    ];
+
+    const powers = [
+      "blessed with the ability to find anything in a messy room",
+      "gifted with eternal optimism and great taste in memes",
+      "cursed with always being right about the weather",
+      "enchanted with the power to make anyone laugh",
+      "destined to always have the perfect comeback (5 minutes too late)",
+      "blessed with supernatural luck in finding good parking",
+      "gifted with the ability to remember everyone's coffee order",
+      "cursed with knowing all the lyrics to 90s songs",
+      "enchanted with the power to find the comfiest spot anywhere",
+      "destined to be the friend everyone calls for advice",
+    ];
+
+    const trait = traits[Math.floor(Math.random() * traits.length)];
+    const power = powers[Math.floor(Math.random() * powers.length)];
+
+    return `${trait} and ${power}`;
+  };
+
   const fetchNameMeaning = async () => {
     try {
       setIsLoading(true);
       setShowResult(false);
 
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
       const prompt = getPrompt(name, language);
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const rawText = response.text();
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+            "HTTP-Referer": window.location.origin, // Your site URL
+            "X-Title": "Name Magic Generator", // Your site title
+          },
+          body: JSON.stringify({
+            model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+            messages: [
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          // Payment required - use fallback
+          console.warn(
+            "OpenRouter API: Payment required, using fallback meanings"
+          );
+          const fallbackMeaning = generateFallbackMeaning(name);
+          setMeaning(fallbackMeaning);
+          setShowResult(true);
+          return;
+        }
+        throw new Error(`OpenRouter API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const rawText = data.choices[0].message.content;
       const cleanText = stripMarkdown(rawText);
 
       setMeaning(cleanText);
       setShowResult(true);
     } catch (error) {
       console.error("Error while getting name meaning:", error);
-      setMeaning("Oops! Something went wrong. Try again!");
+      // Use fallback meaning instead of error message
+      const fallbackMeaning = generateFallbackMeaning(name);
+      setMeaning(fallbackMeaning);
       setShowResult(true);
     } finally {
       setIsLoading(false);
@@ -82,7 +154,7 @@ const App = () => {
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 transform transition-all duration-300 hover:scale-105">
+          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 transform transition-all duration-300 hover:scale-105 ">
             {!showResult ? (
               <div className="space-y-6">
                 <div className="relative">
@@ -171,7 +243,7 @@ const App = () => {
                             })
                         : alert("Sharing is not supported on this device.")
                     }
-                    className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                    className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center "
                   >
                     <Smile className="w-5 h-5 mr-2" />
                     Share the Magic
@@ -182,7 +254,7 @@ const App = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center text-gray-500 text-sm absolute bottom-4 left-0 right-0">
+          {/* <div className="text-center text-gray-500 text-sm absolute bottom-4 left-0 right-0">
             <p>
               ✨ Made with love and a sprinkle of randomness by{" "}
               <a
@@ -194,7 +266,7 @@ const App = () => {
               </a>{" "}
               ✨
             </p>
-          </div>
+          </div> */}
         </div>
 
         <style>{`
@@ -213,6 +285,7 @@ const App = () => {
           }
         `}</style>
       </div>
+      <Footer />
     </>
   );
 };
