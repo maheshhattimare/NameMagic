@@ -14,7 +14,7 @@ const App = () => {
   };
 
   const getPrompt = (name, lang) => {
-    const base = `Tell me a simple, fun story about the name "${name}". What does it mean? Where did it come from? Make it short and sweet, like you're telling it to a friend. Keep it easy short and easy to understand and make the name sound cool and special.`;
+    const base = `Tell me about the name '${name}' in 120 words or less. Use easy words and make it fun, clear, and cool, like chatting with a friend. Explain what it means, where it’s from, and why it’s special. Make the name feel awesome!.`;
 
     const langNote = {
       english: "",
